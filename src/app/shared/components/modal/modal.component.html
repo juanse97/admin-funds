@@ -1,38 +1,39 @@
 <div *ngIf="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
 
-    <div class="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+    <div class="relative bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+
+        <button class="absolute top-3 right-3 text-slate-400 hover:text-slate-600" *ngIf="showContent"
+            (click)="closeModal()">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
 
         <div class="flex items-center gap-3 mb-4">
-
             <div class="w-10 h-10 flex items-center justify-center rounded-full" [ngClass]="iconBg">
-
                 <svg class="w-5 h-5" [ngClass]="iconColor" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 9v2m0 4h.01M5.07 19H18.93a2 2 0 001.73-3l-6.93-12a2 2 0 00-3.46 0l-6.93 12a2 2 0 001.73 3z" />
                 </svg>
-
             </div>
 
             <h3 class="text-lg font-semibold text-slate-800">
                 {{ title }}
             </h3>
-
         </div>
 
         <p class="text-sm text-slate-600 mb-4">
             {{ message }}
         </p>
-
         <div *ngIf="showContent">
             <ng-content></ng-content>
         </div>
 
         <div *ngIf="!showContent" class="flex justify-end gap-2">
-
-            <button class="px-4 py-2 text-sm bg-slate-200 rounded-lg hover:bg-slate-300" (click)="closeModal()">
+            <button class="px-4 py-2 text-sm bg-slate-900 text-white rounded-lg hover:bg-slate-800"
+                (click)="closeModal()">
                 Cerrar
             </button>
-
         </div>
 
     </div>
