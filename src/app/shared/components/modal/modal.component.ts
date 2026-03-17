@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-
-export type ModalType = 'success' | 'error' | 'info';
+import { ModalType } from '../../models/modal.model';
 
 @Component({
     selector: 'app-modal',
@@ -16,11 +15,11 @@ export class ModalComponent {
 
     @Output() close = new EventEmitter<void>();
 
-    closeModal() {
+    closeModal(): void {
         this.close.emit();
     }
 
-    get iconColor() {
+    get iconColor(): string {
         switch (this.type) {
             case 'success':
                 return 'text-green-600';
@@ -31,7 +30,7 @@ export class ModalComponent {
         }
     }
 
-    get iconBg() {
+    get iconBg(): string {
         switch (this.type) {
             case 'success':
                 return 'bg-green-100';

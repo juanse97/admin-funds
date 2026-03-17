@@ -5,12 +5,14 @@ import { FormsModule } from '@angular/forms';
 import { LoadingComponent } from './components/loading/loading.component';
 import { ModalComponent } from './components/modal/modal.component';
 import { FundCardComponent } from './components/fund-card/fund-card.component';
+import { DataTableComponent } from './components/data-table/data-table.component';
 
 @NgModule({
     declarations: [
         LoadingComponent,
         ModalComponent,
-        FundCardComponent
+        FundCardComponent,
+        DataTableComponent
     ],
     imports: [
         CommonModule,
@@ -19,7 +21,8 @@ import { FundCardComponent } from './components/fund-card/fund-card.component';
     exports: [
         LoadingComponent,
         ModalComponent,
-        FundCardComponent
+        FundCardComponent,
+        DataTableComponent
     ]
 })
 export class SharedModule { }

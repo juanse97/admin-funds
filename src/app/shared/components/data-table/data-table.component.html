@@ -1,0 +1,40 @@
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-left rtl:text-right text-gray-500">
+        <thead class="text-xs text-gray-700 uppercase bg-gray-50">
+            <tr>
+                <th *ngFor="let col of columns" scope="col" class="px-6 py-3">
+                    {{ col.label }}
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let row of data" class="bg-white border-b hover:bg-gray-50">
+                <td *ngFor="let col of columns" class="px-6 py-4">
+
+                    <ng-container [ngSwitch]="col.type">
+
+                        <span *ngSwitchCase="'currency'">
+                            {{ row[col.field] | currency:'COP':'symbol':'1.0-0' }}
+                        </span>
+
+                        <span *ngSwitchCase="'badge'"
+                            class="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-700">
+                            {{ row[col.field] }}
+                        </span>
+
+                        <ng-container *ngSwitchCase="'action'">
+                            <ng-container *ngTemplateOutlet="actionTemplate || null; context: { $implicit: row }">
+                            </ng-container>
+                        </ng-container>
+
+                        <span *ngSwitchDefault>
+                            {{ row[col.field] }}
+                        </span>
+
+                    </ng-container>
+
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

@@ -14,10 +14,29 @@
     </app-fund-card>
 </div>
 
-<app-modal [isOpen]="showModal" [type]="typeMessage" [title]="titleMessage" [message]="message"
-    [showContent]="showChildren" (close)="showModal = false">
-    <div class="flex gap-2 mt-4">
+<div *ngIf="subscribedFunds.length" class="my-8">
 
+    <h2 class="text-2xl font-semibold text-slate-800 mb-4">
+        Mis fondos
+    </h2>
+
+    <ng-template #actionTemplate let-fund>
+
+        <button class="px-3 py-1.5 text-xs font-medium text-red-600
+           bg-red-50 rounded-lg hover:bg-red-100 transition" (click)="cancel(fund)">
+            Cancelar
+        </button>
+
+    </ng-template>
+
+    <app-data-table [columns]="columns" [data]="subscribedFunds" [actionTemplate]="actionTemplate">
+    </app-data-table>
+
+</div>
+
+<ng-template #notificationTemplate>
+
+    <div class="flex gap-2 mt-4">
         <button class="flex-1 px-4 py-2 rounded-lg border text-sm font-medium transition" [ngClass]="notificationMethod === 'EMAIL'
       ? 'bg-slate-900 text-white border-slate-900'
       : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'" (click)="notificationMethod = 'EMAIL'">
@@ -29,7 +48,6 @@
       : 'bg-white text-slate-700 border-slate-300 hover:bg-slate-50'" (click)="notificationMethod = 'SMS'">
             SMS
         </button>
-
     </div>
 
     <div class="flex justify-end pt-2">
@@ -38,5 +56,28 @@
             Continuar
         </button>
     </div>
+
+</ng-template>
+<ng-template #unsubscribeTemplate>
+
+    <div class="flex justify-end pt-2">
+        <button class="mt-3 bg-red-600 text-white px-3 py-2 rounded" (click)="confirmUnsubscribe()">
+            Confirmar cancelación
+        </button>
+    </div>
+
+</ng-template>
+
+<app-modal [isOpen]="showModal" [type]="typeMessage" [title]="titleMessage" [message]="message"
+    [showContent]="modalMode !== 'error'" (close)="resetModal()">
+
+    <ng-container *ngIf="modalMode === 'subscribe'">
+        <ng-container *ngTemplateOutlet="notificationTemplate"></ng-container>
+    </ng-container>
+
+    <ng-container *ngIf="modalMode === 'unsubscribe'">
+        <ng-container *ngTemplateOutlet="unsubscribeTemplate"></ng-container>
+
+    </ng-container>
 
 </app-modal>
