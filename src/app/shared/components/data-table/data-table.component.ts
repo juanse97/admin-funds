@@ -8,10 +8,10 @@ import { TableColumn } from '../../models/data-table.model';
 export class DataTableComponent {
 
     @Input() columns: TableColumn[] = [];
-    @Input() data: any[] = [];
-    @Input() actionTemplate?: TemplateRef<any>;
+    @Input() data: Record<string, any>[] = [];
+    @Input() actionTemplate?: TemplateRef<Record<string, any>>;
 
-    getBadgeLabel(row: any, col: any): string {
+    getBadgeLabel(row: Record<string, any>, col: TableColumn): string {
         const value = row[col.field]
 
         if (col.field === 'type') {
@@ -22,10 +22,10 @@ export class DataTableComponent {
             return value === 'EMAIL' ? 'Email' : 'SMS'
         }
 
-        return value
+        return value as string
     }
 
-    getBadgeClass(row: any, col: any): string {
+    getBadgeClass(row: Record<string, any>, col: TableColumn): string {
         const value = row[col.field]
 
         if (col.field === 'type') {
