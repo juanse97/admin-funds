@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common'
 import { RouterModule } from '@angular/router'
 import { FormsModule } from '@angular/forms';
 
-import { TransactionsPageComponent } from './transactions-page.component'
+import { TransactionsPageComponent } from './pages/transactions-page.component'
 import { SharedModule } from 'src/app/shared/shared.module';
 
 @NgModule({

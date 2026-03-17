@@ -6,6 +6,6 @@ export interface Transaction {
     fundName: string
     type: 'SUBSCRIPTION' | 'CANCEL'
     amount: number
-    notificationMethod?: NotificationMethod
+    notificationMethod: NotificationMethod
     date: string
 }

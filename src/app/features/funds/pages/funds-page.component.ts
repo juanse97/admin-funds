@@ -90,7 +90,8 @@ export class FundsPageComponent implements OnInit {
                 fundName: this.selectedFund.name,
                 type: 'SUBSCRIPTION',
                 amount: this.selectedFund.minimumAmount,
-                date: new Date().toISOString()
+                date: new Date().toISOString(),
+                notificationMethod: this.notificationMethod
             })
             this.resetModal()
         } catch (e) {
@@ -129,7 +130,8 @@ export class FundsPageComponent implements OnInit {
             fundName: this.selectedSubscription.fund.name,
             type: 'CANCEL',
             amount: this.selectedSubscription.fund.minimumAmount,
-            date: new Date().toISOString()
+            date: new Date().toISOString(),
+            notificationMethod: this.notificationMethod
         })
 
         this.resetModal()
