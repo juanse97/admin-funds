@@ -29,21 +29,33 @@ export class FundsPageComponent implements OnInit {
     columns: TableColumn[] = COLUMNS_SUBSCRIPTIONS
     private selectedFund: Fund | null = null
     private selectedSubscription: Subscription | null = null
+    hasError = false
+    errorMessage = ''
 
     constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService) { }
 
     ngOnInit(): void {
-        this.fundsService.getFunds().pipe(delay(1500)).subscribe({
+        this.loadFunds()
+        this.wallet.balance$.subscribe(balance => this.balance = balance)
+        this.wallet.subscribedFunds$.subscribe(funds => this.subscribedFunds = funds)
+    }
+
+    loadFunds(): void {
+
+        this.isLoading = true
+        this.hasError = false
+
+        this.fundsService.getFunds().subscribe({
             next: funds => {
                 this.funds = funds
                 this.isLoading = false
             },
             error: () => {
                 this.isLoading = false
+                this.hasError = true
+                this.errorMessage = 'No se pudieron cargar los fondos.'
             }
         })
-        this.wallet.balance$.subscribe(balance => this.balance = balance)
-        this.wallet.subscribedFunds$.subscribe(funds => this.subscribedFunds = funds)
     }
 
     subscribe(fund: Fund): void {
