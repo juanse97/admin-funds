@@ -46,7 +46,7 @@ export class FundsPageComponent implements OnInit {
         this.isLoading = true
         this.hasError = false
 
-        this.fundsService.getFunds().subscribe({
+        this.fundsService.getFunds().pipe(delay(1000)).subscribe({
             next: funds => {
                 this.funds = funds
                 this.isLoading = false

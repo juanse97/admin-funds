@@ -2,9 +2,11 @@
     Historial de transacciones
 </h2>
 
-<div *ngIf="!transactions.length" class="text-center text-slate-500 py-10">
+<app-loading text="Cargando transacciones..." *ngIf="isLoading"></app-loading>
+
+<div *ngIf="!transactions.length && !isLoading" class="text-center text-slate-500 py-10">
     No hay transacciones registradas
 </div>
 
-<app-data-table *ngIf="transactions.length" [columns]="columns" [data]="transactions">
+<app-data-table *ngIf="transactions.length && !isLoading" [columns]="columns" [data]="transactions">
 </app-data-table>
