@@ -10,6 +10,7 @@ import { ModalType } from "src/app/shared/models/modal.model";
 import { NotificationMethod } from "src/app/shared/models/transaction.model";
 import { delay, map } from "rxjs";
 import { InsufficientBalanceError } from "src/app/core/errors/wallet.errors";
+import { NotificationService } from "src/app/core/services/notification.service";
 
 @Component({
     selector: 'app-funds-page',
@@ -35,14 +36,13 @@ export class FundsPageComponent implements OnInit {
     balance$ = this.wallet.balance$
     subscribedFunds$ = this.wallet.subscribedFunds$
 
-    constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService) { }
+    constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService, private notification: NotificationService) { }
 
     ngOnInit(): void {
         this.loadFunds()
     }
 
     loadFunds(): void {
-
         this.isLoading = true
         this.hasError = false
 
@@ -84,6 +84,8 @@ export class FundsPageComponent implements OnInit {
                 date: new Date().toISOString(),
                 notificationMethod: method
             })
+
+            this.notification.success('Te has suscrito correctamente al fondo');
             this.resetModal()
         } catch (error) {
             this.typeMessage = 'error'
@@ -127,6 +129,7 @@ export class FundsPageComponent implements OnInit {
             notificationMethod: method
         })
 
+        this.notification.success('Tu suscripción se ha cancelado');
         this.resetModal()
     }
 
