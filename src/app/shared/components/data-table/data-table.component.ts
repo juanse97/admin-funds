@@ -12,7 +12,6 @@ export class DataTableComponent {
     @Input() actionTemplate?: TemplateRef<any>;
 
     getBadgeLabel(row: any, col: any): string {
-
         const value = row[col.field]
 
         if (col.field === 'type') {
@@ -27,7 +26,6 @@ export class DataTableComponent {
     }
 
     getBadgeClass(row: any, col: any): string {
-
         const value = row[col.field]
 
         if (col.field === 'type') {

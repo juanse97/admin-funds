@@ -8,7 +8,7 @@ import { TransactionsService } from "src/app/core/services/transactions.service"
 import { Subscription } from "src/app/shared/models/subscription.model";
 import { ModalType } from "src/app/shared/models/modal.model";
 import { NotificationMethod } from "src/app/shared/models/transaction.model";
-import { delay } from "rxjs";
+import { delay, map } from "rxjs";
 import { InsufficientBalanceError } from "src/app/core/errors/wallet.errors";
 
 @Component({
@@ -32,13 +32,13 @@ export class FundsPageComponent implements OnInit {
     private selectedSubscription: Subscription | null = null
     hasError = false
     errorMessage = ''
+    balance$ = this.wallet.balance$
+    subscribedFunds$ = this.wallet.subscribedFunds$
 
     constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService) { }
 
     ngOnInit(): void {
         this.loadFunds()
-        this.wallet.balance$.subscribe(balance => this.balance = balance)
-        this.wallet.subscribedFunds$.subscribe(funds => this.subscribedFunds = funds)
     }
 
     loadFunds(): void {
@@ -71,9 +71,10 @@ export class FundsPageComponent implements OnInit {
     confirmSubscription(): void {
         if (!this.selectedFund) return
 
+        const method = this.notificationMethod
+
         try {
-            this.wallet.subscribeToFund(this.selectedFund,
-                this.notificationMethod)
+            this.wallet.subscribeToFund(this.selectedFund, method)
             this.transactionsService.add({
                 id: crypto.randomUUID(),
                 fundId: this.selectedFund.id,
@@ -81,7 +82,7 @@ export class FundsPageComponent implements OnInit {
                 type: 'SUBSCRIPTION',
                 amount: this.selectedFund.minimumAmount,
                 date: new Date().toISOString(),
-                notificationMethod: this.notificationMethod
+                notificationMethod: method
             })
             this.resetModal()
         } catch (error) {
@@ -113,6 +114,7 @@ export class FundsPageComponent implements OnInit {
 
     confirmUnsubscribe(): void {
         if (!this.selectedSubscription) return
+        const method = this.selectedSubscription.notificationMethod
 
         this.wallet.cancelFund(this.selectedSubscription)
         this.transactionsService.add({
@@ -122,7 +124,7 @@ export class FundsPageComponent implements OnInit {
             type: 'CANCEL',
             amount: this.selectedSubscription.fund.minimumAmount,
             date: new Date().toISOString(),
-            notificationMethod: this.notificationMethod
+            notificationMethod: method
         })
 
         this.resetModal()
@@ -134,12 +136,16 @@ export class FundsPageComponent implements OnInit {
         this.selectedFund = null
     }
 
-    tableData() {
-        return this.subscribedFunds.map(subscription => ({
-            ...subscription,
-            name: subscription.fund.name,
-            category: subscription.fund.category,
-            minimumAmount: subscription.fund.minimumAmount
-        }))
-    }
+    tableData$ = this.wallet.subscribedFunds$.pipe(
+        map(subscriptions =>
+            subscriptions.map(s => ({
+                id: s.id,
+                name: s.fund.name,
+                category: s.fund.category,
+                minimumAmount: s.fund.minimumAmount,
+                notificationMethod: s.notificationMethod,
+                original: s
+            }))
+        )
+    )
 }

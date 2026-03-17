@@ -3,7 +3,7 @@
 <p class="mt-2 text-slate-500">
     Saldo disponible:
     <span class="font-semibold text-slate-900">
-        {{ balance | currency:'COP':'symbol':'1.0-0' }}
+        {{ balance$ | async | currency:'COP':'symbol':'1.0-0' }}
     </span>
 </p>
 
@@ -22,26 +22,27 @@
 </div>
 
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4" *ngIf="!isLoading && !hasError">
-    <app-fund-card *ngFor="let fund of funds" [fund]="fund" [balance]="balance" (subscribe)="subscribe($event)">
+    <app-fund-card *ngFor="let fund of funds" [fund]="fund" [balance]="(balance$ | async) ?? 0"
+        (subscribe)="subscribe($event)">
     </app-fund-card>
 </div>
 
-<div *ngIf="subscribedFunds.length" class="my-8">
+<div *ngIf="(subscribedFunds$ | async)?.length" class="my-8">
 
     <h2 class="text-2xl font-semibold text-slate-800 mb-4">
         Mis fondos
     </h2>
 
-    <ng-template #actionTemplate let-subscription>
+    <ng-template #actionTemplate let-row>
 
         <button class="px-3 py-1.5 text-xs font-medium text-red-600
-           bg-red-50 rounded-lg hover:bg-red-100 transition" (click)="cancel(subscription)">
+           bg-red-50 rounded-lg hover:bg-red-100 transition" (click)="cancel(row.original)">
             Cancelar
         </button>
 
     </ng-template>
 
-    <app-data-table [columns]="columns" [data]="tableData()" [actionTemplate]="actionTemplate">
+    <app-data-table [columns]="columns" [data]="(tableData$ | async) ?? []" [actionTemplate]="actionTemplate">
     </app-data-table>
 
 </div>
