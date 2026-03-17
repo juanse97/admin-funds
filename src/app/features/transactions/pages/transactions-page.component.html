@@ -2,11 +2,13 @@
     Historial de transacciones
 </h2>
 
-<app-loading text="Cargando transacciones..." *ngIf="isLoading"></app-loading>
+<app-loading text="Cargando transacciones..." *ngIf="isLoading$ | async">
+</app-loading>
 
-<div *ngIf="!transactions.length && !isLoading" class="text-center text-slate-500 py-10">
-    No hay transacciones registradas
+<div *ngIf="!(transactions$ | async)?.length && !(isLoading$ | async)">
+    No hay transacciones
 </div>
 
-<app-data-table *ngIf="transactions.length && !isLoading" [columns]="columns" [data]="transactions">
+<app-data-table *ngIf="!(isLoading$ | async) && (transactions$ | async)?.length" [columns]="columns"
+    [data]="(transactions$ | async) ?? []">
 </app-data-table>
