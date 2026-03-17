@@ -1,0 +1,10 @@
+<h2 class="text-2xl font-semibold text-slate-800 mb-6">
+    Historial de transacciones
+</h2>
+
+<div *ngIf="!transactions.length" class="text-center text-slate-500 py-10">
+    No hay transacciones registradas
+</div>
+
+<app-data-table *ngIf="transactions.length" [columns]="columns" [data]="transactions">
+</app-data-table>

@@ -4,5 +4,6 @@ export const COLUMNS_SUBSCRIPTIONS: TableColumn[] = [
     { label: 'Fondo', field: 'name' },
     { label: 'Categoría', field: 'category', type: 'badge' },
     { label: 'Monto', field: 'minimumAmount', type: 'currency' },
+    { label: 'Notificación', field: 'notificationMethod', type: 'badge' },
     { label: 'Acciones', field: 'action', type: 'action' }
 ]

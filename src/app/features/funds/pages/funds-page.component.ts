@@ -4,6 +4,10 @@ import { FundsService } from "src/app/core/services/funds.service";
 import { WalletService } from "src/app/core/services/wallet.service";
 import { COLUMNS_SUBSCRIPTIONS } from "src/app/utils/constants";
 import { TableColumn } from "src/app/shared/models/data-table.model";
+import { TransactionsService } from "src/app/core/services/transactions.service";
+import { Subscription } from "src/app/shared/models/subscription.model";
+import { ModalType } from "src/app/shared/models/modal.model";
+import { NotificationMethod } from "src/app/shared/models/transaction.model";
 
 @Component({
     selector: 'app-funds-page',
@@ -12,19 +16,19 @@ import { TableColumn } from "src/app/shared/models/data-table.model";
 export class FundsPageComponent implements OnInit {
     funds: Fund[] = []
     balance = 0
-    notificationMethod: 'EMAIL' | 'SMS' = 'EMAIL'
+    notificationMethod: NotificationMethod = 'EMAIL'
     isLoading = true
     showModal = false
-    typeMessage: 'success' | 'error' | 'info' = 'info'
+    typeMessage: ModalType = 'info'
     titleMessage: string = ''
     message: string = ''
     showChildren = false
-    subscribedFunds: Fund[] = []
+    subscribedFunds: Subscription[] = []
     modalMode: 'subscribe' | 'unsubscribe' | 'error' | null = null
     columns: TableColumn[] = COLUMNS_SUBSCRIPTIONS
     private fundSelected: Fund | null = null
 
-    constructor(private fundsService: FundsService, private wallet: WalletService) { }
+    constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService) { }
 
     ngOnInit(): void {
         this.fundsService.getFunds().subscribe({
@@ -41,13 +45,13 @@ export class FundsPageComponent implements OnInit {
     }
 
     subscribe(fund: Fund): void {
-        if (this.balance < fund.minimumAmount) {
+
+        if (!this.wallet.hasEnoughBalance(fund.minimumAmount)) {
 
             this.typeMessage = 'error'
             this.titleMessage = 'Saldo insuficiente'
             this.message = 'No tienes saldo suficiente para suscribirte'
             this.modalMode = 'error'
-            this.showChildren = false
             this.showModal = true
 
             return
@@ -55,10 +59,9 @@ export class FundsPageComponent implements OnInit {
 
         this.showModal = true
         this.typeMessage = 'info'
-        this.titleMessage = 'Metodo de notificación'
-        this.message = 'Selecciona el metodo de notificación'
+        this.titleMessage = 'Método de notificación'
+        this.message = 'Selecciona el método de notificación'
         this.modalMode = 'subscribe'
-        this.showChildren = true
         this.fundSelected = fund
     }
 
@@ -66,10 +69,18 @@ export class FundsPageComponent implements OnInit {
         if (!this.fundSelected) return
 
         try {
-            this.wallet.subscribeToFund(this.fundSelected)
+            this.wallet.subscribeToFund(this.fundSelected,
+                this.notificationMethod)
+            this.transactionsService.add({
+                id: crypto.randomUUID(),
+                fundId: this.fundSelected.id,
+                fundName: this.fundSelected.name,
+                type: 'SUBSCRIPTION',
+                amount: this.fundSelected.minimumAmount,
+                date: new Date().toISOString()
+            })
             this.resetModal()
         } catch (e) {
-
             this.typeMessage = 'error'
             this.titleMessage = 'Saldo insuficiente'
             this.message = 'No tienes saldo suficiente'
@@ -99,6 +110,14 @@ export class FundsPageComponent implements OnInit {
         if (!this.fundSelected) return
 
         this.wallet.cancelFund(this.fundSelected)
+        this.transactionsService.add({
+            id: crypto.randomUUID(),
+            fundId: this.fundSelected.id,
+            fundName: this.fundSelected.name,
+            type: 'CANCEL',
+            amount: this.fundSelected.minimumAmount,
+            date: new Date().toISOString()
+        })
         this.resetModal()
     }
 
@@ -106,5 +125,15 @@ export class FundsPageComponent implements OnInit {
         this.showModal = false
         this.modalMode = null
         this.fundSelected = null
+    }
+
+    tableData() {
+        return this.subscribedFunds.map(s => ({
+            id: s.fund.id,
+            name: s.fund.name,
+            category: s.fund.category,
+            minimumAmount: s.fund.minimumAmount,
+            notificationMethod: s.notificationMethod
+        }))
     }
 }

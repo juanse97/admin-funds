@@ -17,9 +17,13 @@
                             {{ row[col.field] | currency:'COP':'symbol':'1.0-0' }}
                         </span>
 
-                        <span *ngSwitchCase="'badge'"
-                            class="text-xs font-medium px-2 py-1 rounded bg-blue-100 text-blue-700">
-                            {{ row[col.field] }}
+                        <span *ngSwitchCase="'badge'" class="text-xs font-medium px-2 py-1 rounded"
+                            [ngClass]="getBadgeClass(row, col)">
+                            {{ getBadgeLabel(row, col) }}
+                        </span>
+
+                        <span *ngSwitchCase="'date'">
+                            {{ row[col.field] | date:'dd/MM/yyyy HH:mm:ss' }}
                         </span>
 
                         <ng-container *ngSwitchCase="'action'">
