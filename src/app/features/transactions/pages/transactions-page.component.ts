@@ -9,16 +9,19 @@ import { COLUMNS_TRANSACTIONS } from 'src/app/utils/constants'
     templateUrl: './transactions-page.component.html'
 })
 export class TransactionsPageComponent {
-
     columns: TableColumn[] = COLUMNS_TRANSACTIONS
-
-    transactions$ = this.transactionsService.transactions$.pipe(
-        delay(1000)
-    )
-
-    isLoading$ = this.transactions$.pipe(
-        map(() => false),
-        startWith(true)
+    viewModel$ = this.transactionsService.transactions$.pipe(
+        delay(1000),
+        map(transactions => ({
+            transactions,
+            loading: false,
+            error: null
+        })),
+        startWith({
+            transactions: [],
+            loading: true,
+            error: null
+        })
     )
 
     constructor(private transactionsService: TransactionsService) { }

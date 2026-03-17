@@ -2,13 +2,13 @@
     Historial de transacciones
 </h2>
 
-<app-loading text="Cargando transacciones..." *ngIf="isLoading$ | async">
-</app-loading>
+<ng-container *ngIf="viewModel$ | async as vm">
+    <app-loading *ngIf="vm.loading"></app-loading>
 
-<div *ngIf="!(transactions$ | async)?.length && !(isLoading$ | async)">
-    No hay transacciones
-</div>
+    <div *ngIf="!vm.loading && !vm.transactions.length">
+        No hay transacciones
+    </div>
 
-<app-data-table *ngIf="!(isLoading$ | async) && (transactions$ | async)?.length" [columns]="columns"
-    [data]="(transactions$ | async) ?? []">
-</app-data-table>
+    <app-data-table *ngIf="!vm.loading && vm.transactions.length" [data]="vm.transactions" [columns]="columns">
+    </app-data-table>
+</ng-container>
