@@ -70,11 +70,11 @@ describe('WalletService', () => {
   });
 
   describe('hasEnoughBalance', () => {
-    it('debería retornar true cuando el saldo es suficiente', () => {
-      expect(service.hasEnoughBalance(500000)).toBeTrue();
+    it('debería retornar true cuando el monto es menor al saldo', () => {
+      expect(service.hasEnoughBalance(400000)).toBeTrue();
     });
 
-    it('debería retornar true cuando el monto es exactamente igual al saldo', () => {
+    it('debería retornar true cuando el monto es igual al saldo', () => {
       expect(service.hasEnoughBalance(500000)).toBeTrue();
     });
 
@@ -95,6 +95,19 @@ describe('WalletService', () => {
       expect(subs.length).toBe(1);
       expect(subs[0].fund).toEqual(mockFund);
       expect(subs[0].notificationMethod).toBe('EMAIL');
+    });
+
+    it('debería lanzar error si el saldo es insuficiente', () => {
+      const expensiveFund: Fund = {
+        id: 3,
+        name: 'FONDO_CARO',
+        minimumAmount: 600000,
+        category: 'FPV'
+      };
+
+      expect(() => {
+        service.subscribeToFund(expensiveFund, 'EMAIL');
+      }).toThrow();
     });
 
     it('debería soportar el método de notificación SMS', () => {
