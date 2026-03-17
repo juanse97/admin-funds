@@ -34,16 +34,20 @@ export class WalletService {
         this.subscribedFundsSubject.next([
             ...this.subscribedFunds,
             {
+                id: crypto.randomUUID(),
                 fund,
                 notificationMethod: method
             }
         ])
     }
 
-    cancelFund(fund: Fund): void {
-        this.balanceSubject.next(this.balance + fund.minimumAmount)
+    cancelFund(subscription: Subscription): void {
+        this.balanceSubject.next(
+            this.balance + subscription.fund.minimumAmount
+        )
+
         this.subscribedFundsSubject.next(
-            this.subscribedFunds.filter(subscribedFund => subscribedFund.fund.id !== fund.id)
+            this.subscribedFunds.filter(s => s.id !== subscription.id)
         )
     }
 

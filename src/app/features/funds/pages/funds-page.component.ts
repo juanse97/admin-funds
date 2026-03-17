@@ -26,7 +26,8 @@ export class FundsPageComponent implements OnInit {
     subscribedFunds: Subscription[] = []
     modalMode: 'subscribe' | 'unsubscribe' | 'error' | null = null
     columns: TableColumn[] = COLUMNS_SUBSCRIPTIONS
-    private fundSelected: Fund | null = null
+    private selectedFund: Fund | null = null
+    private selectedSubscription: Subscription | null = null
 
     constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService) { }
 
@@ -45,7 +46,6 @@ export class FundsPageComponent implements OnInit {
     }
 
     subscribe(fund: Fund): void {
-
         if (!this.wallet.hasEnoughBalance(fund.minimumAmount)) {
 
             this.typeMessage = 'error'
@@ -62,21 +62,21 @@ export class FundsPageComponent implements OnInit {
         this.titleMessage = 'Método de notificación'
         this.message = 'Selecciona el método de notificación'
         this.modalMode = 'subscribe'
-        this.fundSelected = fund
+        this.selectedFund = fund
     }
 
     confirmSubscription(): void {
-        if (!this.fundSelected) return
+        if (!this.selectedFund) return
 
         try {
-            this.wallet.subscribeToFund(this.fundSelected,
+            this.wallet.subscribeToFund(this.selectedFund,
                 this.notificationMethod)
             this.transactionsService.add({
                 id: crypto.randomUUID(),
-                fundId: this.fundSelected.id,
-                fundName: this.fundSelected.name,
+                fundId: this.selectedFund.id,
+                fundName: this.selectedFund.name,
                 type: 'SUBSCRIPTION',
-                amount: this.fundSelected.minimumAmount,
+                amount: this.selectedFund.minimumAmount,
                 date: new Date().toISOString()
             })
             this.resetModal()
@@ -92,48 +92,48 @@ export class FundsPageComponent implements OnInit {
 
         this.showModal = false
         this.showChildren = false
-        this.fundSelected = null
+        this.selectedFund = null
     }
 
 
-    cancel(fund: Fund): void {
+    cancel(subscription: Subscription): void {
+        this.selectedSubscription = subscription
         this.typeMessage = 'info'
         this.titleMessage = 'Cancelar suscripción'
-        this.message = `¿Seguro que deseas cancelar la suscripción al fondo ${fund.name}?`
+        this.message = `¿Seguro que deseas cancelar la suscripción al fondo ${subscription.fund.name}?`
         this.showChildren = false
         this.modalMode = 'unsubscribe'
         this.showModal = true
-        this.fundSelected = fund
     }
 
     confirmUnsubscribe(): void {
-        if (!this.fundSelected) return
+        if (!this.selectedSubscription) return
 
-        this.wallet.cancelFund(this.fundSelected)
+        this.wallet.cancelFund(this.selectedSubscription)
         this.transactionsService.add({
             id: crypto.randomUUID(),
-            fundId: this.fundSelected.id,
-            fundName: this.fundSelected.name,
+            fundId: this.selectedSubscription.fund.id,
+            fundName: this.selectedSubscription.fund.name,
             type: 'CANCEL',
-            amount: this.fundSelected.minimumAmount,
+            amount: this.selectedSubscription.fund.minimumAmount,
             date: new Date().toISOString()
         })
+
         this.resetModal()
     }
 
     resetModal(): void {
         this.showModal = false
         this.modalMode = null
-        this.fundSelected = null
+        this.selectedFund = null
     }
 
     tableData() {
-        return this.subscribedFunds.map(s => ({
-            id: s.fund.id,
-            name: s.fund.name,
-            category: s.fund.category,
-            minimumAmount: s.fund.minimumAmount,
-            notificationMethod: s.notificationMethod
+        return this.subscribedFunds.map(subscription => ({
+            ...subscription,
+            name: subscription.fund.name,
+            category: subscription.fund.category,
+            minimumAmount: subscription.fund.minimumAmount
         }))
     }
 }
