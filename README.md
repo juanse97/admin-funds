@@ -23,8 +23,8 @@ Asegúrate de tener instaladas las siguientes herramientas antes de continuar:
 
 | Herramienta     | Versión mínima  |
 | --------------- | --------------- |
-| **Node.js**     | 16.x o superior |
-| **npm**         | 8.x o superior  |
+| **Node.js**     | 20.x o superior |
+| **npm**         | 10.x o superior |
 | **Angular CLI** | 16.2.x          |
 
 Para verificar las versiones instaladas:
