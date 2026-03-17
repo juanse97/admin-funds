@@ -9,6 +9,7 @@ import { Subscription } from "src/app/shared/models/subscription.model";
 import { ModalType } from "src/app/shared/models/modal.model";
 import { NotificationMethod } from "src/app/shared/models/transaction.model";
 import { delay } from "rxjs";
+import { InsufficientBalanceError } from "src/app/core/errors/wallet.errors";
 
 @Component({
     selector: 'app-funds-page',
@@ -59,17 +60,6 @@ export class FundsPageComponent implements OnInit {
     }
 
     subscribe(fund: Fund): void {
-        if (!this.wallet.hasEnoughBalance(fund.minimumAmount)) {
-
-            this.typeMessage = 'error'
-            this.titleMessage = 'Saldo insuficiente'
-            this.message = 'No tienes saldo suficiente para suscribirte'
-            this.modalMode = 'error'
-            this.showModal = true
-
-            return
-        }
-
         this.showModal = true
         this.typeMessage = 'info'
         this.titleMessage = 'Método de notificación'
@@ -94,19 +84,20 @@ export class FundsPageComponent implements OnInit {
                 notificationMethod: this.notificationMethod
             })
             this.resetModal()
-        } catch (e) {
+        } catch (error) {
             this.typeMessage = 'error'
-            this.titleMessage = 'Saldo insuficiente'
-            this.message = 'No tienes saldo suficiente'
-            this.showChildren = false
+            this.modalMode = 'error'
             this.showModal = true
 
-            return
-        }
+            if (error instanceof InsufficientBalanceError) {
+                this.titleMessage = 'Saldo insuficiente'
+                this.message = error.message
+                return
+            }
 
-        this.showModal = false
-        this.showChildren = false
-        this.selectedFund = null
+            this.titleMessage = 'Error'
+            this.message = 'Ocurrió un error inesperado'
+        }
     }
 
 

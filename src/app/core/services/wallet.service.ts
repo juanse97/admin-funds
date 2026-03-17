@@ -3,6 +3,7 @@ import { BehaviorSubject } from 'rxjs'
 import { Fund } from 'src/app/shared/models/fund.model'
 import { Subscription } from 'src/app/shared/models/subscription.model'
 import { NotificationMethod } from 'src/app/shared/models/transaction.model'
+import { InsufficientBalanceError } from '../errors/wallet.errors'
 
 @Injectable({ providedIn: 'root' })
 export class WalletService {
@@ -30,6 +31,10 @@ export class WalletService {
     }
 
     subscribeToFund(fund: Fund, method: NotificationMethod): void {
+        if (this.balance < fund.minimumAmount) {
+            throw new InsufficientBalanceError()
+        }
+
         this.balanceSubject.next(this.balance - fund.minimumAmount)
         this.subscribedFundsSubject.next([
             ...this.subscribedFunds,
