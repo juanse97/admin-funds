@@ -8,6 +8,7 @@ import { TransactionsService } from "src/app/core/services/transactions.service"
 import { Subscription } from "src/app/shared/models/subscription.model";
 import { ModalType } from "src/app/shared/models/modal.model";
 import { NotificationMethod } from "src/app/shared/models/transaction.model";
+import { delay } from "rxjs";
 
 @Component({
     selector: 'app-funds-page',
@@ -32,7 +33,7 @@ export class FundsPageComponent implements OnInit {
     constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService) { }
 
     ngOnInit(): void {
-        this.fundsService.getFunds().subscribe({
+        this.fundsService.getFunds().pipe(delay(1500)).subscribe({
             next: funds => {
                 this.funds = funds
                 this.isLoading = false
