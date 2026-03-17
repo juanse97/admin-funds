@@ -8,7 +8,7 @@ import { TransactionsService } from "src/app/core/services/transactions.service"
 import { Subscription } from "src/app/shared/models/subscription.model";
 import { ModalType } from "src/app/shared/models/modal.model";
 import { NotificationMethod } from "src/app/shared/models/transaction.model";
-import { delay, map } from "rxjs";
+import { delay, finalize, map, Subject, take, takeUntil } from "rxjs";
 import { InsufficientBalanceError } from "src/app/core/errors/wallet.errors";
 import { NotificationService } from "src/app/core/services/notification.service";
 
@@ -35,6 +35,7 @@ export class FundsPageComponent implements OnInit {
     errorMessage = ''
     balance$ = this.wallet.balance$
     subscribedFunds$ = this.wallet.subscribedFunds$
+    private destroy$ = new Subject<void>();
 
     constructor(private fundsService: FundsService, private wallet: WalletService, private transactionsService: TransactionsService, private notification: NotificationService) { }
 
@@ -43,20 +44,28 @@ export class FundsPageComponent implements OnInit {
     }
 
     loadFunds(): void {
-        this.isLoading = true
-        this.hasError = false
+        this.isLoading = true;
+        this.hasError = false;
 
-        this.fundsService.getFunds().pipe(delay(1000)).subscribe({
+        this.fundsService.getFunds().pipe(
+            take(1),
+            delay(1000),
+            takeUntil(this.destroy$),
+            finalize(() => this.isLoading = false)
+        ).subscribe({
             next: funds => {
-                this.funds = funds
-                this.isLoading = false
+                this.funds = funds;
             },
             error: () => {
-                this.isLoading = false
-                this.hasError = true
-                this.errorMessage = 'No se pudieron cargar los fondos.'
+                this.hasError = true;
+                this.errorMessage = 'No se pudieron cargar los fondos.';
             }
-        })
+        });
+    }
+
+    ngOnDestroy(): void {
+        this.destroy$.next();
+        this.destroy$.complete();
     }
 
     subscribe(fund: Fund): void {
